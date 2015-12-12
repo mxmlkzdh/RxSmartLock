@@ -168,8 +168,8 @@ public void onError(Throwable e) {
 public void onError(Throwable e) {
 
     if (e instanceof ConnectionException) {
-        // Handle the connection failed errors here.
         ConnectionResult result = ((ConnectionException) e).getConnectionResult();
+        // Handle the connection failed errors here.
         if (result.hasResolution()) {
             result.startResolutionForResult(MainActivity.this, RESULT_RC);
         }
