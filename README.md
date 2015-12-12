@@ -63,12 +63,11 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
 
     @Override
     public void onNext(Credential credential) {
-
+        // On a successful credential request, use the resulting Credential object to complete the user's sign-in to your app.
     }
 
 });
 ```
-On a successful credential request, use the resulting `Credential` object to complete the user's sign-in to your app. Use the `getAccountType()` method to determine the type of retrieved credentials, then complete the appropriate sign-in process. For example, for Google Sign-In, create a `GoogleApiClient` object that includes the user's ID, then use the object to start the sign-in flow. For password-based sign-in, use the user's ID and password from the `Credential` object to complete your app's sign-in process.
 
 For more information, check out the [official Google documentaion][2] on how to handle successful credential requests.
 
