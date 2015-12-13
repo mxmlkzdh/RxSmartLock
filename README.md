@@ -195,6 +195,8 @@ mSubscription = mSmartLock.deleteCredential(credential).subscribe(new Subscriber
 
 ### Error Handling
 
+Since [Smart Lock for Passwords][1] is a Google Play Services API, we need to handle possible connection failures when the connection to Google Play services fails or becomes suspended. This is how you can deal with these situtations gracefully when using **RxSmartLock**:
+
 ```java
 @Override
 public void onError(Throwable e) {
@@ -222,8 +224,11 @@ public void onError(Throwable e) {
 }
 ```
 
+You can find more information on how to handle connection failures [here][4].
+
 ## Add RxSmartLock to your project
 
  [1]: https://developers.google.com/identity/smartlock-passwords/android/
  [2]: https://developers.google.com/identity/smartlock-passwords/android/retrieve-credentials
  [3]: https://developers.google.com/identity/smartlock-passwords/android/store-credentials
+ [4]: https://developers.google.com/android/guides/api-client
