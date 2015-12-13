@@ -68,7 +68,7 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
 
 });
 ```
-When user input is required to select a credential, the `getStatusCode()` method returns `RESOLUTION_REQUIRED`. In this case, call the status object's `startResolutionForResult()` method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's `onActivityResult()` method by calling the `retrieveCredentialFromIntent(Intent)` method on the `SmartLock` object that you created:
+When user input is required to select a credential, the `getStatusCode()` method returns `RESOLUTION_REQUIRED`. In this case, call the status object's `startResolutionForResult()` method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's `onActivityResult()` method by calling the `retrieveCredentialFromIntent(Intent)` method on the `SmartLock` object that you created. This method returns an observabale `Observable<Credential>` which you can again subscribe to:
 
 ```java
 @Override
