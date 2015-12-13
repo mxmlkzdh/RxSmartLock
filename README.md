@@ -1,6 +1,9 @@
 # RxSmartLock
 Reactive extension for Google's [Smart Lock for Passwords API][1].
 
+## Introduction
+[Sebastiano Poggi][5] has written a fantastic blog post on Smart Lock. Read it [here][6].
+
 ## Usage
 
 In order to use **RxSmartLock**, build a `SmartLock` object using the `SmartLock.Builder` class in the `onCreate` method of your `Activity`:
@@ -27,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
 ```
 Now you are ready to use **RxSmartLock**.
 
-### Retrieve a user's stored credentials
+### Retrieve a User's Stored Credentials
 
 Automatically sign users into your app by using the Credentials API to request and retrieve stored credentials for your users.
 
@@ -46,7 +49,7 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
         // Handle unsuccessful and incomplete credential requests.
         if (e instanceof StatusException) {
             Status status = ((StatusException) e).getStatus();
-            if (status.getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED) {
+            if (status.hasResolution()) {
                 // Prompt the user to choose a saved credential; do not show the hint selector.
                 try {
                     status.startResolutionForResult(MainActivity.this, CREDENTIAL_REQUEST_RC);
@@ -94,7 +97,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 For more information, check out the [official documentaion][2] on how to handle successful credential requests.
 
-### Store a user's credentials
+### Store a User's Credentials
 
 After users successfully sign in, create accounts, or change passwords, allow them to store their credentials to automate future authentication in your app.
 
@@ -115,7 +118,11 @@ mSubscription = mSmartLock.storeCredential(credential).subscribe(new Subscriber<
         if (e instanceof StatusException) {
             Status status = ((StatusException) e).getStatus();
             if (status.hasResolution()) {
-                status.startResolutionForResult(MainActivity.this, CREDENTIAL_STORE_RC);
+                try {
+                    status.startResolutionForResult(MainActivity.this, CREDENTIAL_STORE_RC);
+                } catch (IntentSender.SendIntentException e1) {
+                    Log.e(TAG, "STATUS: Failed to send resolution.");
+                }
             }
         }
         
@@ -154,7 +161,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
 To learn more about how to store a user's credentials, check out the [official documentaion][3].
 
-### Delete stored credentials
+### Delete Stored Credentials
 
 Delete credentials from Smart Lock when either of the following circumstances occur:
 
@@ -195,6 +202,8 @@ mSubscription = mSmartLock.deleteCredential(credential).subscribe(new Subscriber
 
 ### Error Handling
 
+Since [Smart Lock for Passwords][1] is a Google Play Services API, we need to handle possible connection failures when the connection to Google Play services fails or becomes suspended. This is how you can deal with these situtations gracefully when using **RxSmartLock**:
+
 ```java
 @Override
 public void onError(Throwable e) {
@@ -222,8 +231,19 @@ public void onError(Throwable e) {
 }
 ```
 
-## Add RxSmartLock to your project
+You can find more information on how to handle connection failures [here][4].
+
+## Add RxSmartLock To Your Project
+
+## Additional Notes
+
+This library is inspired by the [ReactiveLocation library for Android][7] developed by [Michał Charmas][8] and a great [blog post][6] written by [Sebastiano Poggi][5] on Smart Lock. Thank you guys!
 
  [1]: https://developers.google.com/identity/smartlock-passwords/android/
  [2]: https://developers.google.com/identity/smartlock-passwords/android/retrieve-credentials
  [3]: https://developers.google.com/identity/smartlock-passwords/android/store-credentials
+ [4]: https://developers.google.com/android/guides/api-client
+ [5]: https://medium.com/@seebrock3r
+ [6]: https://medium.com/@seebrock3r/login-experiences-that-don-t-suck-a42fade07067
+ [7]: https://github.com/mcharmas/Android-ReactiveLocation
+ [8]: https://github.com/mcharmas
