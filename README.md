@@ -92,7 +92,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
-For more information, check out the [official Google documentaion][2] on how to handle successful credential requests.
+For more information, check out the [official documentaion][2] on how to handle successful credential requests.
 
 ### Store a user's credentials
 
@@ -132,6 +132,27 @@ mSubscription = mSmartLock.storeCredential(credential).subscribe(new Subscriber<
             
 });
 ```
+
+If the call to `SmartLock.storeCredential(Credential)` is not immediately successful, the credentials might be new, in which case the user must confirm the save request. Resolve the save request with `startResolutionForResult()` to prompt the user for confirmation.
+
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+    super.onActivityResult(requestCode, resultCode, data);
+
+    if (requestCode == CREDENTIAL_STORE_RC) {
+        if (resultCode == RESULT_OK) {
+            Log.d(TAG, "SAVE: OK");
+        } else {
+            Log.e(TAG, "SAVE: Canceled by user.");
+        }
+    }
+
+}
+```
+
+To learn more about how to store a user's credentials, check out the [official documentaion][3].
 
 ### Delete stored credentials
 
@@ -205,3 +226,4 @@ public void onError(Throwable e) {
 
  [1]: https://developers.google.com/identity/smartlock-passwords/android/
  [2]: https://developers.google.com/identity/smartlock-passwords/android/retrieve-credentials
+ [3]: https://developers.google.com/identity/smartlock-passwords/android/store-credentials
