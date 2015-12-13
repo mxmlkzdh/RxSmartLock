@@ -235,6 +235,16 @@ You can find more information on how to handle connection failures [here][4].
 
 ## Add RxSmartLock To Your Project
 
+Add this to your **build.gradle** file:
+```java
+repositories {
+    maven { url "https://jitpack.io" }
+}
+dependencies {
+  compile 'com.github.ShlMlkzdh:RxSmartLock:1.0.2'
+}
+```
+
 ## Additional Notes
 
 This library is inspired by the [ReactiveLocation library for Android][7] developed by [Michał Charmas][8] and a great [blog post][6] written by [Sebastiano Poggi][5] on Smart Lock. Thank you guys!
