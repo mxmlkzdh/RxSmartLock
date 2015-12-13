@@ -6,7 +6,7 @@ Reactive extension for Google's [Smart Lock for Passwords API][1].
 
 ## Usage
 
-In order to use **RxSmartLock**, build a `SmartLock` object using the `SmartLock.Builder` class in the `onCreate` method of your `Activity`:
+In order to use **RxSmartLock**, create a `SmartLock` object using the `SmartLock.Builder` class in the `onCreate` method of your `Activity`:
 
 ```java
 public class MainActivity extends AppCompatActivity {
@@ -71,7 +71,7 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
 
 });
 ```
-When user input is required to select a credential, the `getStatusCode()` method returns `RESOLUTION_REQUIRED`. In this case, call the status object's `startResolutionForResult()` method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's `onActivityResult()` method by calling the `retrieveCredentialFromIntent(Intent)` method on the `SmartLock` object that you created. This method returns an observabale `Observable<Credential>` which you can again subscribe to:
+When user input is required to select a credential, the `Status.hasResolution()` method returns `true`. In this case, call the status object's `startResolutionForResult()` method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's `onActivityResult()` method by calling the `retrieveCredentialFromIntent(Intent)` method on the `SmartLock` object that you created. This method returns an observabale `Observable<Credential>` which you can again subscribe to:
 
 ```java
 @Override
@@ -200,7 +200,7 @@ mSubscription = mSmartLock.deleteCredential(credential).subscribe(new Subscriber
 });
 ```
 
-### Error Handling
+### Google Play Services Connection Failures Handling
 
 Since [Smart Lock for Passwords][1] is a Google Play Services API, we need to handle possible connection failures when the connection to Google Play services fails or becomes suspended. This is how you can deal with these situtations gracefully when using **RxSmartLock**:
 
