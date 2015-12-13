@@ -68,6 +68,29 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
 
 });
 ```
+When user input is required to select a credential, the `getStatusCode()` method returns `RESOLUTION_REQUIRED`. In this case, call the status object's `startResolutionForResult()` method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's `onActivityResult()` method by calling the `retrieveCredentialFromIntent(Intent)` method on the `SmartLock` object that you created:
+
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        
+    super.onActivityResult(requestCode, resultCode, data);
+        
+    if (requestCode == CREDENTIAL_REQUEST_RC) {
+        if (resultCode == RESULT_OK) {
+            mSmartLock.retrieveCredentialFromIntent(data).subscribe(new Action1<Credential>() {
+                @Override
+                public void call(Credential credential) {
+                    // On a successful credential request, use the resulting Credential object to complete the user's sign-in to your app.
+                }
+            });
+        } else {
+            Log.e(TAG, "Credential Read: NOT OK");
+        }
+    }
+
+}
+```
 
 For more information, check out the [official Google documentaion][2] on how to handle successful credential requests.
 
