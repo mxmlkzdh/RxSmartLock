@@ -49,7 +49,7 @@ mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credent
         // Handle unsuccessful and incomplete credential requests.
         if (e instanceof StatusException) {
             Status status = ((StatusException) e).getStatus();
-            if (status.getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED) {
+            if (status.hasResolution()) {
                 // Prompt the user to choose a saved credential; do not show the hint selector.
                 try {
                     status.startResolutionForResult(MainActivity.this, CREDENTIAL_REQUEST_RC);
