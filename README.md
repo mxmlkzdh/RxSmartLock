@@ -118,7 +118,11 @@ mSubscription = mSmartLock.storeCredential(credential).subscribe(new Subscriber<
         if (e instanceof StatusException) {
             Status status = ((StatusException) e).getStatus();
             if (status.hasResolution()) {
-                status.startResolutionForResult(MainActivity.this, CREDENTIAL_STORE_RC);
+                try {
+                    status.startResolutionForResult(MainActivity.this, CREDENTIAL_STORE_RC);
+                } catch (IntentSender.SendIntentException e1) {
+                    Log.e(TAG, "STATUS: Failed to send resolution.");
+                }
             }
         }
         
