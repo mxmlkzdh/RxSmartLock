@@ -6,11 +6,12 @@ import android.content.Intent;
 import com.google.android.gms.auth.api.credentials.Credential;
 import com.google.android.gms.auth.api.credentials.CredentialPickerConfig;
 import com.google.android.gms.auth.api.credentials.CredentialRequest;
-import com.shlmlkzdh.rxsmartlock.observable.RetrieveCredentialObservable;
 import com.shlmlkzdh.rxsmartlock.observable.DeleteCredentialObservable;
+import com.shlmlkzdh.rxsmartlock.observable.RetrieveCredentialObservable;
 import com.shlmlkzdh.rxsmartlock.observable.StoreCredentialObservable;
 
 import rx.Observable;
+import rx.functions.Func0;
 
 
 public class SmartLock {
@@ -24,19 +25,58 @@ public class SmartLock {
     }
 
     public Observable<Credential> retrieveCredential() {
-        return Observable.create(new RetrieveCredentialObservable(mContext, mCredentialRequest));
+
+        return Observable.defer(new Func0<Observable<Credential>>() {
+            @Override
+            public Observable<Credential> call() {
+                try {
+                    return Observable.create(
+                            new RetrieveCredentialObservable(mContext, mCredentialRequest)
+                    );
+                } catch (Exception e) {
+                    return Observable.error(e);
+                }
+            }
+        });
+
     }
 
     public Observable<Credential> retrieveCredentialFromIntent(Intent data) {
         return Observable.just((Credential) data.getParcelableExtra(Credential.EXTRA_KEY));
     }
 
-    public Observable<Boolean> storeCredential(Credential credential) {
-        return Observable.create(new StoreCredentialObservable(mContext, credential));
+    public Observable<Boolean> storeCredential(final Credential credential) {
+
+        return Observable.defer(new Func0<Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call() {
+                try {
+                    return Observable.create(
+                            new StoreCredentialObservable(mContext, credential)
+                    );
+                } catch (Exception e) {
+                    return Observable.error(e);
+                }
+            }
+        });
+
     }
 
-    public Observable<Boolean> deleteCredential(Credential credential) {
-        return Observable.create(new DeleteCredentialObservable(mContext, credential));
+    public Observable<Boolean> deleteCredential(final Credential credential) {
+
+        return Observable.defer(new Func0<Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call() {
+                try {
+                    return Observable.create(
+                            new DeleteCredentialObservable(mContext, credential)
+                    );
+                } catch (Exception e) {
+                    return Observable.error(e);
+                }
+            }
+        });
+
     }
 
     public static class Builder {
