@@ -241,7 +241,7 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 dependencies {
-  compile 'com.github.ShlMlkzdh:RxSmartLock:1.0.2'
+  compile 'com.github.ShlMlkzdh:RxSmartLock:1.1.0'
 }
 ```
 
