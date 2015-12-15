@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-
+        classpath 'com.novoda:bintray-release:0.3.4'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -20,4 +20,67 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    ARTIFACT_ID = 'rx-smart-lock'
+    VERSION_NAME = '1.0.2'
+    VERSION_CODE = 1
+    DESCRIPTION = 'Reactive extension for Google\'s Smart Lock for Passwords API.'
+    SITE_URL = 'https://github.com/ShlMlkzdh/RxSmartLock'
+    GIT_URL = 'https://github.com/ShlMlkzdh/RxSmartLock.git'
+    GROUP_NAME = 'com.shlmlkzdh'
+    COMPILE_SDK = 23
+    BUILD_TOOLS = '23.0.2'
+    MODULE_NAME = 'rx-smart-lock'
+    LICENSE = 'The Apache Software License, Version 2.0'
+    DEVELOPER_ID = 'shlmlkzdh'
+    DEVELOPER_NAME = 'Soheil Malekzadeh'
+    DEVELOPER_EMAIL = 'shl.mlkzdh@gmail.com'
+    IS_UPLOADING = project.getGradle().startParameter.taskNames.any { it.contains('bintrayUpload') }
+}
+
+subprojects {
+    group = GROUP_NAME
+    version = VERSION_NAME
+    if (IS_UPLOADING && project.name in [MODULE_NAME]) {
+        println project.name
+        apply plugin: 'maven'
+        gradle.taskGraph.whenReady { taskGraph ->
+            taskGraph.getAllTasks().find {
+                it.path == ":$project.name:generatePomFileForMavenPublication"
+            }.doLast {
+                file("build/publications/maven/pom-default.xml").delete()
+                println 'Overriding pom-file to make sure we can sync to maven central!'
+                pom {
+                    //noinspection GroovyAssignabilityCheck
+                    project {
+                        name "$project.name"
+                        artifactId ARTIFACT_ID
+                        packaging project.name == 'compiler' ? 'jar' : 'aar'
+                        description DESCRIPTION
+                        url SITE_URL
+                        version VERSION_NAME
+                        scm {
+                            url GIT_URL
+                            connection GIT_URL
+                            developerConnection GIT_URL
+                        }
+                        licenses {
+                            license {
+                                name LICENSE
+                            }
+                        }
+                        developers {
+                            developer {
+                                id DEVELOPER_ID
+                                name DEVELOPER_NAME
+                                email DEVELOPER_EMAIL
+                            }
+                        }
+                    }
+                }.writeTo("build/publications/maven/pom-default.xml")
+            }
+        }
+    }
 }
