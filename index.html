@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>RxSmartLock by ShlMlkzdh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">RxSmartLock</h1>
+      <h2 class="project-tagline">Reactive extension for Google&#39;s Smart Lock for Passwords API</h2>
+      <a href="https://github.com/ShlMlkzdh/RxSmartLock" class="btn">View on GitHub</a>
+      <a href="https://github.com/ShlMlkzdh/RxSmartLock/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ShlMlkzdh/RxSmartLock/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="rxsmartlock" class="anchor" href="#rxsmartlock" aria-hidden="true"><span class="octicon octicon-link"></span></a>RxSmartLock</h1>
+
+<p>Reactive extension for Google's <a href="https://developers.google.com/identity/smartlock-passwords/android/">Smart Lock for Passwords API</a>.</p>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p><a href="https://medium.com/@seebrock3r">Sebastiano Poggi</a> has written a fantastic blog post on Smart Lock. Read it <a href="https://medium.com/@seebrock3r/login-experiences-that-don-t-suck-a42fade07067">here</a>.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>In order to use <strong>RxSmartLock</strong>, create a <code>SmartLock</code> object using the <code>SmartLock.Builder</code> class in the <code>onCreate</code> method of your <code>Activity</code>:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">MainActivity</span> <span class="pl-k">extends</span> <span class="pl-e">AppCompatActivity</span> {
+
+    <span class="pl-k">private</span> <span class="pl-smi">SmartLock</span> mSmartLock;
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>(<span class="pl-smi">Bundle</span> <span class="pl-v">savedInstanceState</span>) {
+
+        <span class="pl-v">super</span><span class="pl-k">.</span>onCreate(savedInstanceState);
+        setContentView(<span class="pl-smi">R</span><span class="pl-k">.</span>layout<span class="pl-k">.</span>activity_main);
+
+        mSmartLock <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">SmartLock</span>.<span class="pl-smi">Builder</span>(<span class="pl-v">this</span>)
+                .setAccountTypes(<span class="pl-smi">IdentityProviders</span><span class="pl-c1"><span class="pl-k">.</span>GOOGLE</span>, <span class="pl-smi">IdentityProviders</span><span class="pl-c1"><span class="pl-k">.</span>FACEBOOK</span>) <span class="pl-c">// Use the constants defined in IdentityProviders to specify commonly-used sign-in providers.</span>
+                .setPasswordLoginSupported(<span class="pl-c1">true</span>) <span class="pl-c">// Used for password-based sign-in.</span>
+                .build();
+
+    }
+
+}</pre></div>
+
+<p>Now you are ready to use <strong>RxSmartLock</strong>.</p>
+
+<h3>
+<a id="retrieve-a-users-stored-credentials" class="anchor" href="#retrieve-a-users-stored-credentials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Retrieve a User's Stored Credentials</h3>
+
+<p>Automatically sign users into your app by using the Credentials API to request and retrieve stored credentials for your users.</p>
+
+<p>To request stored credentials, call the <code>retrieveCredential()</code> method on the <code>SmartLock</code> object that you created from anywhere in your <code>Activity</code>. This method returns an observabale <code>Observable&lt;Credential&gt;</code> which you can subscribe to:</p>
+
+<div class="highlight highlight-source-java"><pre>mSubscription <span class="pl-k">=</span> mSmartLock<span class="pl-k">.</span>retrieveCredential()<span class="pl-k">.</span>subscribe(<span class="pl-k">new</span> <span class="pl-k">Subscriber&lt;<span class="pl-smi">Credential</span>&gt;</span>() {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCompleted</span>() {
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onError</span>(<span class="pl-smi">Throwable</span> <span class="pl-v">e</span>) {
+
+        <span class="pl-c">// Handle unsuccessful and incomplete credential requests.</span>
+        <span class="pl-k">if</span> (e <span class="pl-k">instanceof</span> <span class="pl-smi">StatusException</span>) {
+            <span class="pl-smi">Status</span> status <span class="pl-k">=</span> ((<span class="pl-smi">StatusException</span>) e)<span class="pl-k">.</span>getStatus();
+            <span class="pl-k">if</span> (status<span class="pl-k">.</span>hasResolution()) {
+                <span class="pl-c">// Prompt the user to choose a saved credential; do not show the hint selector.</span>
+                <span class="pl-k">try</span> {
+                    status<span class="pl-k">.</span>startResolutionForResult(<span class="pl-smi">MainActivity</span><span class="pl-k">.</span><span class="pl-v">this</span>, <span class="pl-c1">CREDENTIAL_REQUEST_RC</span>);
+                } <span class="pl-k">catch</span> (<span class="pl-smi">IntentSender</span><span class="pl-k">.</span><span class="pl-smi">SendIntentException</span> e1) {
+                    <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>STATUS: Failed to send resolution.<span class="pl-pds">"</span></span>);
+                }
+            } <span class="pl-k">else</span> {
+                <span class="pl-c">// The user must create an account or sign in manually.</span>
+                <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>STATUS: Unsuccessful credential request.<span class="pl-pds">"</span></span>);
+            }
+        }
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onNext</span>(<span class="pl-smi">Credential</span> <span class="pl-v">credential</span>) {
+        <span class="pl-c">// On a successful credential request, use the resulting Credential object to complete the user's sign-in to your app.</span>
+    }
+
+});</pre></div>
+
+<p>When user input is required to select a credential, the <code>Status.hasResolution()</code> method returns <code>true</code>. In this case, call the status object's <code>startResolutionForResult()</code> method to prompt the user to choose an account. Then, retrieve the user's chosen credentials from the activity's <code>onActivityResult()</code> method by calling the <code>retrieveCredentialFromIntent(Intent)</code> method on the <code>SmartLock</code> object that you created. This method returns an observabale <code>Observable&lt;Credential&gt;</code> which you can again subscribe to:</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+<span class="pl-k">protected</span> <span class="pl-k">void</span> onActivityResult(<span class="pl-k">int</span> requestCode, <span class="pl-k">int</span> resultCode, <span class="pl-smi">Intent</span> data) {
+
+    <span class="pl-v">super</span><span class="pl-k">.</span>onActivityResult(requestCode, resultCode, data);
+
+    <span class="pl-k">if</span> (requestCode <span class="pl-k">==</span> <span class="pl-c1">CREDENTIAL_REQUEST_RC</span>) {
+        <span class="pl-k">if</span> (resultCode <span class="pl-k">==</span> <span class="pl-c1">RESULT_OK</span>) {
+            mSmartLock<span class="pl-k">.</span>retrieveCredentialFromIntent(data)<span class="pl-k">.</span>subscribe(<span class="pl-k">new</span> <span class="pl-k">Action1&lt;<span class="pl-smi">Credential</span>&gt;</span>() {
+                <span class="pl-k">@Override</span>
+                <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">call</span>(<span class="pl-smi">Credential</span> <span class="pl-v">credential</span>) {
+                    <span class="pl-c">// On a successful credential request, use the resulting Credential object to complete the user's sign-in to your app.</span>
+                }
+            });
+        } <span class="pl-k">else</span> {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>Credential Read: NOT OK<span class="pl-pds">"</span></span>);
+        }
+    }
+
+}</pre></div>
+
+<p>For more information, check out the <a href="https://developers.google.com/identity/smartlock-passwords/android/retrieve-credentials">official documentaion</a> on how to handle successful credential requests.</p>
+
+<h3>
+<a id="store-a-users-credentials" class="anchor" href="#store-a-users-credentials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Store a User's Credentials</h3>
+
+<p>After users successfully sign in, create accounts, or change passwords, allow them to store their credentials to automate future authentication in your app.</p>
+
+<p>To save users' credentials, you can call the <code>storeCredential(Credential)</code> method on the <code>SmartLock</code> object that you created from anywhere in your <code>Activity</code>. This method returns an observabale <code>Observable&lt;Boolean&gt;</code> which you can subscribe to:</p>
+
+<div class="highlight highlight-source-java"><pre>mSubscription <span class="pl-k">=</span> mSmartLock<span class="pl-k">.</span>storeCredential(credential)<span class="pl-k">.</span>subscribe(<span class="pl-k">new</span> <span class="pl-k">Subscriber&lt;<span class="pl-smi">Boolean</span>&gt;</span>() {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCompleted</span>() {
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onError</span>(<span class="pl-smi">Throwable</span> <span class="pl-v">e</span>) {
+
+        <span class="pl-c">// Try to resolve the save request. </span>
+        <span class="pl-c">// This will prompt the user if the credential is new.</span>
+        <span class="pl-k">if</span> (e <span class="pl-k">instanceof</span> <span class="pl-smi">StatusException</span>) {
+            <span class="pl-smi">Status</span> status <span class="pl-k">=</span> ((<span class="pl-smi">StatusException</span>) e)<span class="pl-k">.</span>getStatus();
+            <span class="pl-k">if</span> (status<span class="pl-k">.</span>hasResolution()) {
+                <span class="pl-k">try</span> {
+                    status<span class="pl-k">.</span>startResolutionForResult(<span class="pl-smi">MainActivity</span><span class="pl-k">.</span><span class="pl-v">this</span>, <span class="pl-c1">CREDENTIAL_STORE_RC</span>);
+                } <span class="pl-k">catch</span> (<span class="pl-smi">IntentSender</span><span class="pl-k">.</span><span class="pl-smi">SendIntentException</span> e1) {
+                    <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>STATUS: Failed to send resolution.<span class="pl-pds">"</span></span>);
+                }
+            }
+        }
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onNext</span>(<span class="pl-smi">Boolean</span> <span class="pl-v">aBoolean</span>) {
+
+        <span class="pl-k">if</span> (aBoolean) {
+            <span class="pl-c">// We have successfully saved the user's credential.</span>
+        }
+
+    }
+
+});</pre></div>
+
+<p>If the call to <code>SmartLock.storeCredential(Credential)</code> is not immediately successful, the credentials might be new, in which case the user must confirm the save request. Resolve the save request with <code>startResolutionForResult()</code> to prompt the user for confirmation.</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+<span class="pl-k">protected</span> <span class="pl-k">void</span> onActivityResult(<span class="pl-k">int</span> requestCode, <span class="pl-k">int</span> resultCode, <span class="pl-smi">Intent</span> data) {
+
+    <span class="pl-v">super</span><span class="pl-k">.</span>onActivityResult(requestCode, resultCode, data);
+
+    <span class="pl-k">if</span> (requestCode <span class="pl-k">==</span> <span class="pl-c1">CREDENTIAL_STORE_RC</span>) {
+        <span class="pl-k">if</span> (resultCode <span class="pl-k">==</span> <span class="pl-c1">RESULT_OK</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>d(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>SAVE: OK<span class="pl-pds">"</span></span>);
+        } <span class="pl-k">else</span> {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, <span class="pl-s"><span class="pl-pds">"</span>SAVE: Canceled by user.<span class="pl-pds">"</span></span>);
+        }
+    }
+
+}</pre></div>
+
+<p>To learn more about how to store a user's credentials, check out the <a href="https://developers.google.com/identity/smartlock-passwords/android/store-credentials">official documentaion</a>.</p>
+
+<h3>
+<a id="delete-stored-credentials" class="anchor" href="#delete-stored-credentials" aria-hidden="true"><span class="octicon octicon-link"></span></a>Delete Stored Credentials</h3>
+
+<p>Delete credentials from Smart Lock when either of the following circumstances occur:</p>
+
+<ul>
+<li>Signing in with the credentials fails because the account no longer exists or the password is incorrect.</li>
+<li>The user completes the app's account deletion flow.</li>
+</ul>
+
+<p>To delete credentials, you can call the <code>deleteCredential(Credential)</code> method on the <code>SmartLock</code> object that you created from anywhere in your <code>Activity</code>. This method returns an observabale <code>Observable&lt;Boolean&gt;</code> which you can subscribe to:</p>
+
+<div class="highlight highlight-source-java"><pre>mSubscription <span class="pl-k">=</span> mSmartLock<span class="pl-k">.</span>deleteCredential(credential)<span class="pl-k">.</span>subscribe(<span class="pl-k">new</span> <span class="pl-k">Subscriber&lt;<span class="pl-smi">Boolean</span>&gt;</span>() {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCompleted</span>() {
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onError</span>(<span class="pl-smi">Throwable</span> <span class="pl-v">e</span>) {
+
+        <span class="pl-c">// Handle unsuccessful deletion.</span>
+        <span class="pl-k">if</span> (e <span class="pl-k">instanceof</span> <span class="pl-smi">StatusException</span>) {
+            <span class="pl-smi">Status</span> status <span class="pl-k">=</span> ((<span class="pl-smi">StatusException</span>) e)<span class="pl-k">.</span>getStatus();
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-c1">TAG</span>, status<span class="pl-k">.</span>getStatusMessage());
+        }
+
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onNext</span>(<span class="pl-smi">Boolean</span> <span class="pl-v">aBoolean</span>) {
+
+        <span class="pl-k">if</span> (aBoolean) {
+            <span class="pl-c">// Credential was deleted successfully.</span>
+        }
+
+    }
+
+});</pre></div>
+
+<h3>
+<a id="google-play-services-connection-failures-handling" class="anchor" href="#google-play-services-connection-failures-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Google Play Services Connection Failures Handling</h3>
+
+<p>Since <a href="https://developers.google.com/identity/smartlock-passwords/android/">Smart Lock for Passwords</a> is a Google Play Services API, we need to handle possible connection failures when the connection to Google Play services fails or becomes suspended. This is how you can deal with these situtations gracefully when using <strong>RxSmartLock</strong>:</p>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onError(<span class="pl-smi">Throwable</span> e) {
+
+    <span class="pl-k">if</span> (e <span class="pl-k">instanceof</span> <span class="pl-smi">ConnectionSuspendedException</span>) {
+        <span class="pl-k">int</span> errorCode <span class="pl-k">=</span> ((<span class="pl-smi">ConnectionSuspendedException</span>) e)<span class="pl-k">.</span>getCode();
+        <span class="pl-c">// Handle the connection suspension errors here.</span>
+    }
+
+}</pre></div>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+<span class="pl-k">public</span> <span class="pl-k">void</span> onError(<span class="pl-smi">Throwable</span> e) {
+
+    <span class="pl-k">if</span> (e <span class="pl-k">instanceof</span> <span class="pl-smi">ConnectionException</span>) {
+        <span class="pl-smi">ConnectionResult</span> result <span class="pl-k">=</span> ((<span class="pl-smi">ConnectionException</span>) e)<span class="pl-k">.</span>getConnectionResult();
+        <span class="pl-c">// Handle the connection failed errors here.</span>
+        <span class="pl-k">if</span> (result<span class="pl-k">.</span>hasResolution()) {
+            result<span class="pl-k">.</span>startResolutionForResult(<span class="pl-smi">MainActivity</span><span class="pl-k">.</span><span class="pl-v">this</span>, <span class="pl-c1">RESULT_RC</span>);
+        }
+    }
+
+}</pre></div>
+
+<p>You can find more information on how to handle connection failures <a href="https://developers.google.com/android/guides/api-client">here</a>.</p>
+
+<h2>
+<a id="add-rxsmartlock-to-your-project" class="anchor" href="#add-rxsmartlock-to-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add RxSmartLock To Your Project</h2>
+
+<p>Add this to your <strong>build.gradle</strong> file:</p>
+
+<div class="highlight highlight-source-java"><pre>repositories {
+    maven { url <span class="pl-s"><span class="pl-pds">"</span>https://jitpack.io<span class="pl-pds">"</span></span> }
+}
+dependencies {
+  compile <span class="pl-s"><span class="pl-pds">'</span>com.github.ShlMlkzdh:RxSmartLock:1.1.0<span class="pl-pds">'</span></span>
+}</pre></div>
+
+<h2>
+<a id="additional-notes" class="anchor" href="#additional-notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Additional Notes</h2>
+
+<p>This library is inspired by the <a href="https://github.com/mcharmas/Android-ReactiveLocation">ReactiveLocation library for Android</a> developed by <a href="https://github.com/mcharmas">Michał Charmas</a> and a great <a href="https://medium.com/@seebrock3r/login-experiences-that-don-t-suck-a42fade07067">blog post</a> written by <a href="https://medium.com/@seebrock3r">Sebastiano Poggi</a> on Smart Lock. Thank you guys!</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright 2015 Soheil Malekzadeh
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ShlMlkzdh/RxSmartLock">RxSmartLock</a> is maintained by <a href="https://github.com/ShlMlkzdh">ShlMlkzdh</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-71458220-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
