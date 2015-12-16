@@ -24,8 +24,8 @@ task clean(type: Delete) {
 
 ext {
     ARTIFACT_ID = 'rx-smart-lock'
-    VERSION_NAME = '1.1.0'
-    VERSION_CODE = 2
+    VERSION_NAME = '1.1.1'
+    VERSION_CODE = 3
     DESCRIPTION = 'Reactive extension for Google\'s Smart Lock for Passwords API.'
     SITE_URL = 'https://github.com/ShlMlkzdh/RxSmartLock'
     GIT_URL = 'https://github.com/ShlMlkzdh/RxSmartLock.git'
