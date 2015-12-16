@@ -237,11 +237,8 @@ You can find more information on how to handle connection failures [here][4].
 
 Add this to your **build.gradle** file:
 ```java
-repositories {
-    maven { url "https://jitpack.io" }
-}
 dependencies {
-  compile 'com.github.ShlMlkzdh:RxSmartLock:1.1.0'
+     compile 'com.shlmlkzdh:rx-smart-lock:1.1.1'
 }
 ```
 
