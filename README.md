@@ -3,7 +3,6 @@ Reactive extension for Google's [Smart Lock for Passwords API][1].
 
 [![Platform](https://img.shields.io/badge/Platform-Android-brightgreen.svg?style=flat)](http://developer.android.com/index.html)
 [![API](https://img.shields.io/badge/API-9%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=9)
-[![Twitter](https://img.shields.io/badge/Twitter-@ShlMlkzdh-blue.svg?style=flat)](http://twitter.com/ShlMlkzdh)
 
 ## Introduction
 [Sebastiano Poggi][5] has written a fantastic blog post on Smart Lock. Read it [here][6].
