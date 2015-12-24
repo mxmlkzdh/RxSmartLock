@@ -3,9 +3,11 @@ android:
   components:
     - platform-tools
     - tools
-    - build-tools-23.0.1
+    - build-tools-23.0.2
     - android-23
     - extra-android-m2repository
+    - extra-google-google_play_services
+    - extra-google-m2repository
 
 before_script:
     - chmod +x gradlew
