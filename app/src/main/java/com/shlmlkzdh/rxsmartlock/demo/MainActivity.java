@@ -16,6 +16,7 @@ import com.shlmlkzdh.rxsmartlock.SmartLock;
 import com.shlmlkzdh.rxsmartlock.exception.StatusException;
 
 import rx.Subscriber;
+import rx.Subscription;
 import rx.functions.Action1;
 
 
@@ -23,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int CREDENTIAL_REQUEST_RC = 111;
+
+    private Subscription mSubscription;
     private SmartLock mSmartLock;
 
     @Override
@@ -62,9 +65,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onStop() {
+
+        super.onStop();
+
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+        }
+
+    }
+
+    @Override
     public void onClick(View v) {
 
-        mSmartLock.retrieveCredential().subscribe(new Subscriber<Credential>() {
+        mSubscription = mSmartLock.retrieveCredential().subscribe(new Subscriber<Credential>() {
 
             @Override
             public void onCompleted() {
