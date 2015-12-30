@@ -2,6 +2,7 @@ package com.shlmlkzdh.rxsmartlock.observable;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
@@ -95,12 +96,12 @@ public class RetrieveCredentialObservable implements Observable.OnSubscribe<Cred
         }
 
         @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
             mObserver.onError(new ConnectionException(connectionResult));
         }
 
         @Override
-        public void onResult(CredentialRequestResult credentialRequestResult) {
+        public void onResult(@NonNull CredentialRequestResult credentialRequestResult) {
 
             Status status = credentialRequestResult.getStatus();
             if (status.isSuccess()) {

@@ -2,6 +2,7 @@ package com.shlmlkzdh.rxsmartlock.observable;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.credentials.Credential;
@@ -94,12 +95,12 @@ public class DeleteCredentialObservable implements Observable.OnSubscribe<Boolea
         }
 
         @Override
-        public void onConnectionFailed(ConnectionResult connectionResult) {
+        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
             mObserver.onError(new ConnectionException(connectionResult));
         }
 
         @Override
-        public void onResult(Result result) {
+        public void onResult(@NonNull Result result) {
 
             Status status = result.getStatus();
             if (status.isSuccess()) {
