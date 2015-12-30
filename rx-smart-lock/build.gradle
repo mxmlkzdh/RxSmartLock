@@ -29,7 +29,7 @@ publish {
     userOrg = 'shlmlkzdh'
     groupId = 'com.shlmlkzdh'
     artifactId = 'rx-smart-lock'
-    publishVersion = '1.1.1'
+    publishVersion = '1.1.2'
     desc = 'Reactive extension for Google\'s Smart Lock for Passwords API.'
     website = 'https://github.com/ShlMlkzdh/RxSmartLock'
 }
