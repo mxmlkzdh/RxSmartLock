@@ -241,7 +241,7 @@ You can find more information on how to handle connection failures [here][4].
 Add this to your **build.gradle** file:
 ```java
 dependencies {
-     compile 'com.shlmlkzdh:rx-smart-lock:1.1.1'
+     compile 'com.shlmlkzdh:rx-smart-lock:1.1.4'
 }
 ```
 
